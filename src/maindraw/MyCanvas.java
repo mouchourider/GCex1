@@ -19,8 +19,8 @@ public class MyCanvas extends Canvas implements MouseListener,  MouseMotionListe
 
 	private static final long serialVersionUID = 1L;
 	static String dir = System.getProperty("user.dir");
-	public static final String filename = dir+"\\src\\"+"example.scn"; //name of file to read data from.
-	public static final String filenameSettings = dir+"\\src\\"+"example.viw"; //name of file to read data from.
+	public static final String filename = dir+"\\src\\"+"example3d.scn"; //name of file to read data from.
+	public static final String filenameSettings = dir+"\\src\\"+"example3d.viw"; //name of file to read data from.
 	private String locationTranspormation;
 	private Point pStart, pEnd;
 	private double centerX , centerY, radiusPStart, radiusPEnd, scaleParameter;
