@@ -39,7 +39,7 @@ public class MyCanvas extends Canvas implements MouseListener,  MouseMotionListe
 	private double sepertation = 83;
 	private double[] vectorStart, vectorEnd;
 	private double[][] TrM, viewMatrix, CT, TT;
-	private double[][] vectorVertex, mMatrix, mTag, matrixTr1 , matrixRo, matrixTr2, matrixTr3, matrixSc1, matrixSc2, pVector, lVector, upVector, wVector, zVector, yVector, xVector;
+	private double[][] vectorVertex, mMatrix, mTag, matrixTr1 , matrixRo, matrixTr2, matrixTr3, matrixSc1, matrixSc2, pVector, lVector, upVector, wVector, zVector, zVectorN , yVector, xVector;
 	public MyCanvas() {
 		File settings = new File(filenameSettings);
 		Scanner setScan;
@@ -52,27 +52,31 @@ public class MyCanvas extends Canvas implements MouseListener,  MouseMotionListe
 			//System.out.println(coordinateYCenterWindows);
 			coorZCamera = setScan.nextDouble();
 			setScan.next();
-			pVector = Matrixs.CreateVertexVector3D(coorXCamera, coorYCamera, coorZCamera, 0);
+			pVector = Matrixs.CreateVertexVector3D(coorXCamera, coorYCamera, coorZCamera, 1);
 			coorXLookAt = setScan.nextDouble();
 			//System.out.println(coordinateXCenterWindows);
 			coorYLookAt = setScan.nextDouble();
 			//System.out.println(coordinateYCenterWindows);
 			coorZLookAt = setScan.nextDouble();
 			setScan.next();
-			lVector = Matrixs.CreateVertexVector3D(coorXLookAt, coorYLookAt, coorZLookAt, 0);
+			lVector = Matrixs.CreateVertexVector3D(coorXLookAt, coorYLookAt, coorZLookAt, 1);
 			coorXUpCam = setScan.nextDouble();
 			//System.out.println(coordinateXCenterWindows);
 			coorYUpCam = setScan.nextDouble();
 			//System.out.println(coordinateYCenterWindows);
 			coorZUpCam = setScan.nextDouble();
 			setScan.next();
-			upVector = Matrixs.CreateVertexVector3D(coorXUpCam, coorYUpCam, coorZUpCam, 0);
+			upVector = Matrixs.CreateVertexVector3D(coorXUpCam, coorYUpCam, coorZUpCam, 1);
 			zVector = Matrixs.SubAndDivVectors3D(pVector,lVector, 0);
+			zVectorN = Matrixs.SubVectors3D(pVector,lVector, 0);
 			xVector = Matrixs.CrossProdAndDivVectors3D(upVector,zVector, 0);
 			yVector = Matrixs.CrossProdVectors3D(zVector,xVector, 0);
 			wVector = Matrixs.CreateVertexVector3D(0,0,0,1);
 			mMatrix = Matrixs.BuildMatrixFromVectors(xVector,yVector,zVector,wVector);
-			mTag = Matrixs.BuildMatrixFromVectors(Matrixs.CreateVertexVector3D(1,0,0,pVector[0][0]),Matrixs.CreateVertexVector3D(0,1,0,pVector[1][0]),Matrixs.CreateVertexVector3D(0,0,1,pVector[2][0]),Matrixs.CreateVertexVector3D(0,0,0,1));
+			mTag = Matrixs.BuildMatrixFromVectors(Matrixs.CreateVertexVector3D(1,0,0,-pVector[0][0]),
+												  Matrixs.CreateVertexVector3D(0,1,0,-pVector[1][0]),
+												  Matrixs.CreateVertexVector3D(0,0,1,-pVector[2][0]),
+												  Matrixs.CreateVertexVector3D(0,0,0,1));
 			mMatrix = Mathematics.multiplicateMatrix(mMatrix,mTag);
 			wl = setScan.nextDouble();
 			//System.out.println(ww);
@@ -93,15 +97,17 @@ public class MyCanvas extends Canvas implements MouseListener,  MouseMotionListe
 			e.printStackTrace();
 		}
 		//for viewer matrix
-		matrixTr1 = Matrixs.CreateTranslateMatrix2D(-coordinateXCenterWindows, -coordinateYCenterWindows);
-		matrixRo = Matrixs.CreateRotateMatrix2D(-1 * Math.toRadians(direction));
-		matrixSc1 = Matrixs.CreateScaleMatrix2D(vw / ww, vh / wh);
-		matrixTr2 = Matrixs.CreateTranslateMatrix2D(20, 20);
-	    matrixSc2 = Matrixs.CreateScaleMatrix2D(1, -1);
+		coordinateXCenterWindows = (vw / (wr-wl))/2;
+		coordinateYCenterWindows = (vh / (wt-wb))/2;
+		matrixTr1 = Matrixs.CreateTranslateMatrix3D(-coordinateXCenterWindows, -coordinateYCenterWindows, 0);
+		//matrixRo = Matrixs.CreateRotateMatrix3D(-1 * Math.toRadians(10));
+		matrixSc1 = Matrixs.CreateScaleMatrix3D(vw / 2, vh / 2,0);
+		matrixTr2 = Matrixs.CreateTranslateMatrix3D(20, 20, 0);
+	    matrixSc2 = Matrixs.CreateScaleMatrix3D(1, -1, 0);
 		matrixTr3 = Matrixs.CreateTranslateMatrix3D(0, vh + 40, 0);
 		TT = Matrixs.CreateMatrix3D();
 		CT = Matrixs.CreateMatrix3D();
-		vectorVertex = new double [3][1];
+		vectorVertex = new double [4][1];
 		setSize((int)vw + 40, (int)vh + 40);
 		centerX = (vw / 2) + 20;
 		centerY = (vh / 2) + 20;
@@ -111,13 +117,13 @@ public class MyCanvas extends Canvas implements MouseListener,  MouseMotionListe
 		addMouseMotionListener(this);
 	}
 	public void paint(Graphics g) {
-		viewMatrix = matrixTr3;
-		//viewMatrix = Mathematics.multiplicateMatrix(matrixTr3, matrixSc2);
-		//viewMatrix = Mathematics.multiplicateMatrix(viewMatrix, matrixTr2);
-		//viewMatrix = Mathematics.multiplicateMatrix(viewMatrix, matrixSc1);
+		viewMatrix = Mathematics.multiplicateMatrix(matrixTr3, matrixSc2);
+		viewMatrix = Mathematics.multiplicateMatrix(viewMatrix, matrixTr2);
+		viewMatrix = Mathematics.multiplicateMatrix(viewMatrix, matrixSc1);
 		//viewMatrix = Mathematics.multiplicateMatrix(viewMatrix, matrixRo);
-		//viewMatrix = Mathematics.multiplicateMatrix(viewMatrix, matrixTr1);
+		viewMatrix = Mathematics.multiplicateMatrix(viewMatrix, matrixTr1);
 		TrM = Mathematics.multiplicateMatrix(CT, TT);
+		TrM = Mathematics.multiplicateMatrix(viewMatrix, TrM);
 		TrM = Mathematics.multiplicateMatrix(TrM, mMatrix);
 		//read from file
 		File fileName1 = new File(filename);
@@ -134,10 +140,11 @@ public class MyCanvas extends Canvas implements MouseListener,  MouseMotionListe
 				vertexZ = scan.nextDouble();
 				System.out.println(vertexZ);
 			    vectorVertex = Matrixs.CreateVertexVector3D(vertexX, vertexY, vertexZ, 1);
-			    //vectorVertex = Mathematics.multiplicateMatrix(mMatrix, vectorVertex);
+
 				vectorVertex = Mathematics.multiplicateMatrix(TrM, vectorVertex);
 			    vertexX = vectorVertex[0][0] + 20;
 			    vertexY = vectorVertex[1][0] + 20;
+				vertexZ = vectorVertex[2][0];
 				vertexs[i] = new Vertex3D(vertexX,vertexY,vertexZ);
 			}
 			int sizeEdge = scan.nextInt();
@@ -214,8 +221,10 @@ public class MyCanvas extends Canvas implements MouseListener,  MouseMotionListe
 		 radiusPStart = Mathematics.distance(pStart, centerX, centerY);
 		 radiusPEnd = Mathematics.distance(pEnd, centerX, centerY);
 		 scaleParameter = radiusPEnd / radiusPStart;
-		 CT = Matrixs.CreateScaleMatrix3D(scaleParameter, scaleParameter, scaleParameter);
-		 CT = Mathematics.multiplicateMatrix(Mathematics.multiplicateMatrix(Matrixs.CreateTranslateMatrix3D(centerX, centerY, 1), CT), Matrixs.CreateTranslateMatrix3D(-centerX, -centerY, 1));
+		 CT = Matrixs.CreateScaleMatrix3D(scaleParameter, scaleParameter, 1);
+		 CT = Mathematics.multiplicateMatrix(Mathematics.multiplicateMatrix
+						 (Matrixs.CreateTranslateMatrix3D(centerX, centerY, zVectorN[2][0]), CT)
+				 , Matrixs.CreateTranslateMatrix3D(-centerX, -centerY, -zVectorN[2][0]));
 	}
 	public void executeRotate() {
 		//vector start = (x of start point - x of center point,y of start point - y of center point)
@@ -229,11 +238,11 @@ public class MyCanvas extends Canvas implements MouseListener,  MouseMotionListe
 		 double angleEnd = getAngleFromVectorToXAxis(vectorEnd);
 		 double angleFinish = angleStart - angleEnd;
 		 
-		 CT = Matrixs.CreateRotateMatrix2D(Math.toRadians(angleFinish));
+		 CT = Matrixs.CreateRotateMatrix3D(Math.toRadians(angleFinish));
 		 CT = Mathematics.multiplicateMatrix
 				 (Mathematics.multiplicateMatrix
-						 (Matrixs.CreateTranslateMatrix2D(centerX, centerY), CT)
-						 , Matrixs.CreateTranslateMatrix2D(-centerX, -centerY));
+						 (Matrixs.CreateTranslateMatrix3D(centerX, centerY, zVectorN[2][0]), CT)
+						 , Matrixs.CreateTranslateMatrix3D(-centerX, -centerY, -zVectorN[2][0]));
 	}
 	public void executeAction(String type) {
 		//the matrix separate in this direction:

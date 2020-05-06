@@ -55,6 +55,26 @@ public class Matrixs {
 	        rotateMatrix[2][2] = 1;
 	        return rotateMatrix;
 	 }
+	public static double[][] CreateRotateMatrix3D(double rotateAngle) {
+		double[][] rotateMatrix = new double[4][4];
+		rotateMatrix[0][0] = Math.cos(rotateAngle);
+		rotateMatrix[0][1] = Math.sin(rotateAngle);
+		rotateMatrix[0][2] = 0;
+		rotateMatrix[0][3] = 0;
+		rotateMatrix[1][0] = -1 * Math.sin(rotateAngle);
+		rotateMatrix[1][1] = Math.cos(rotateAngle);
+		rotateMatrix[1][2] = 0;
+		rotateMatrix[1][3] = 0;
+		rotateMatrix[2][0] = 0;
+		rotateMatrix[2][1] = 0;
+		rotateMatrix[2][2] = 1;
+		rotateMatrix[2][3] = 0;
+		rotateMatrix[3][0] = 0;
+		rotateMatrix[3][1] = 0;
+		rotateMatrix[3][2] = 0;
+		rotateMatrix[3][3] = 1;
+		return rotateMatrix;
+	}
 	 public static double[][] CreateRotateBackMatrix2D(double rotateAngle) {
 	        return CreateRotateMatrix2D(-rotateAngle);
 	 }
@@ -73,20 +93,20 @@ public class Matrixs {
 	}
 	public static double[][] CreateTranslateMatrix3D(double translateX, double translateY, double translateZ) {
 		double[][] translateMatrix = new double[4][4];
-		translateMatrix[0][0] = translateX;
+		translateMatrix[0][0] = 1;
 		translateMatrix[0][1] = 0;
 		translateMatrix[0][2] = 0;
-		translateMatrix[0][3] = 0;
+		translateMatrix[0][3] = translateX;
 
 		translateMatrix[1][0] = 0;
-		translateMatrix[1][1] = translateY;
+		translateMatrix[1][1] = 1;
 		translateMatrix[1][2] = 0;
-		translateMatrix[1][3] = 0;
+		translateMatrix[1][3] = translateY;
 
 		translateMatrix[2][0] = 0;
 		translateMatrix[2][1] = 0;
-		translateMatrix[2][2] = translateZ;
-		translateMatrix[2][3] = 0;
+		translateMatrix[2][2] = 1;
+		translateMatrix[2][3] = translateZ;
 
 		translateMatrix[3][0] = 0;
 		translateMatrix[3][1] = 0;
@@ -155,6 +175,16 @@ public class Matrixs {
 		factor = AbsValueVector3D(vectorVertex);
 		for(i = 0; i<3; i++){
 			vectorVertex[i][0] = vectorVertex[i][0]/factor;
+		}
+		vectorVertex[3][0] = w;
+		return vectorVertex;
+	}
+	public static double[][] SubVectors3D(double[][] vectorA, double[][] vectorB, double w){
+		double[][] vectorVertex = new double[4][1];
+		double factor = 0;
+		int i = 0;
+		for(i = 0; i<3; i++){
+			vectorVertex[i][0] = vectorA[i][0] - vectorB[i][0];
 		}
 		vectorVertex[3][0] = w;
 		return vectorVertex;
