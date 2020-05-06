@@ -16,6 +16,29 @@ public class Matrixs {
 	        scaleMatrix[2][2] = 1;
 	        return scaleMatrix;
 	 }
+	public static double[][] CreateScaleMatrix3D(double scaleX, double scaleY, double scaleZ) {
+		double[][] scaleMatrix = new double[4][4];
+		scaleMatrix[0][0] = scaleX;
+		scaleMatrix[0][1] = 0;
+		scaleMatrix[0][2] = 0;
+		scaleMatrix[0][3] = 0;
+
+		scaleMatrix[1][0] = 0;
+		scaleMatrix[1][1] = scaleY;
+		scaleMatrix[1][2] = 0;
+		scaleMatrix[1][3] = 0;
+
+		scaleMatrix[2][0] = 0;
+		scaleMatrix[2][1] = 0;
+		scaleMatrix[2][2] = scaleZ;
+		scaleMatrix[2][3] = 0;
+
+		scaleMatrix[3][0] = 0;
+		scaleMatrix[3][1] = 0;
+		scaleMatrix[3][2] = 0;
+		scaleMatrix[3][3] = 1;
+		return scaleMatrix;
+	}
 	 public static double[][] CreateScaleBackMatrix2D(double scaleX, double scaleY) {
 	        return CreateScaleMatrix2D(1 / scaleX, 1 / scaleY);
 	 }
@@ -36,18 +59,41 @@ public class Matrixs {
 	        return CreateRotateMatrix2D(-rotateAngle);
 	 }
 	 public static double[][] CreateTranslateMatrix2D(double translateX, double translateY) {
-	        double[][] translateMatrix = new double[3][3];
-	        translateMatrix[0][0] = 1;
-	        translateMatrix[0][1] = 0;
-	        translateMatrix[0][2] = translateX;
-	        translateMatrix[1][0] = 0;
-	        translateMatrix[1][1] = 1;
-	        translateMatrix[1][2] = translateY;
-	        translateMatrix[2][0] = 0;
-	        translateMatrix[2][1] = 0;
-	        translateMatrix[2][2] = 1;
-	        return translateMatrix;
-	 }
+		double[][] translateMatrix = new double[3][3];
+		translateMatrix[0][0] = 1;
+		translateMatrix[0][1] = 0;
+		translateMatrix[0][2] = translateX;
+		translateMatrix[1][0] = 0;
+		translateMatrix[1][1] = 1;
+		translateMatrix[1][2] = translateY;
+		translateMatrix[2][0] = 0;
+		translateMatrix[2][1] = 0;
+		translateMatrix[2][2] = 1;
+		return translateMatrix;
+	}
+	public static double[][] CreateTranslateMatrix3D(double translateX, double translateY, double translateZ) {
+		double[][] translateMatrix = new double[4][4];
+		translateMatrix[0][0] = translateX;
+		translateMatrix[0][1] = 0;
+		translateMatrix[0][2] = 0;
+		translateMatrix[0][3] = 0;
+
+		translateMatrix[1][0] = 0;
+		translateMatrix[1][1] = translateY;
+		translateMatrix[1][2] = 0;
+		translateMatrix[1][3] = 0;
+
+		translateMatrix[2][0] = 0;
+		translateMatrix[2][1] = 0;
+		translateMatrix[2][2] = translateZ;
+		translateMatrix[2][3] = 0;
+
+		translateMatrix[3][0] = 0;
+		translateMatrix[3][1] = 0;
+		translateMatrix[3][2] = 0;
+		translateMatrix[3][3] = 1;
+		return translateMatrix;
+	}
 	 public static double[][] CreateTranslateBackMatrix2D(double translateX, double translateY) {
 	        return CreateTranslateMatrix2D(-translateX, -translateY);
 	 }

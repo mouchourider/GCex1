@@ -16,9 +16,11 @@ import utils.Mathematics;
 import shape.Vertex;
 import shape.Vertex3D;
 import shape.Edge;
+import shape.Edge3D;
 public class MyCanvas extends Canvas implements MouseListener,  MouseMotionListener{
 
 	private static final long serialVersionUID = 1L;
+	private static boolean debugging = true;
 	static String dir = System.getProperty("user.dir");
 	public static final String filename = dir+"\\src\\"+"example3d.scn"; //name of file to read data from.
 	public static final String filenameSettings = dir+"\\src\\"+"example3d.viw"; //name of file to read data from.
@@ -96,9 +98,9 @@ public class MyCanvas extends Canvas implements MouseListener,  MouseMotionListe
 		matrixSc1 = Matrixs.CreateScaleMatrix2D(vw / ww, vh / wh);
 		matrixTr2 = Matrixs.CreateTranslateMatrix2D(20, 20);
 	    matrixSc2 = Matrixs.CreateScaleMatrix2D(1, -1);
-		matrixTr3 = Matrixs.CreateTranslateMatrix2D(0, vh + 40);
-		TT = Matrixs.CreateMatrix2D();
-		CT = Matrixs.CreateMatrix2D();
+		matrixTr3 = Matrixs.CreateTranslateMatrix3D(0, vh + 40, 0);
+		TT = Matrixs.CreateMatrix3D();
+		CT = Matrixs.CreateMatrix3D();
 		vectorVertex = new double [3][1];
 		setSize((int)vw + 40, (int)vh + 40);
 		centerX = (vw / 2) + 20;
@@ -116,14 +118,14 @@ public class MyCanvas extends Canvas implements MouseListener,  MouseMotionListe
 		//viewMatrix = Mathematics.multiplicateMatrix(viewMatrix, matrixRo);
 		//viewMatrix = Mathematics.multiplicateMatrix(viewMatrix, matrixTr1);
 		TrM = Mathematics.multiplicateMatrix(CT, TT);
-		TrM = Mathematics.multiplicateMatrix(TrM, viewMatrix);
+		TrM = Mathematics.multiplicateMatrix(TrM, mMatrix);
 		//read from file
 		File fileName1 = new File(filename);
 		try {
 			Scanner scan = new Scanner(fileName1);
 			int sizeVertex = scan.nextInt();
 			System.out.println(sizeVertex);
-			Vertex[] vertexs = new Vertex[sizeVertex];
+			Vertex3D[] vertexs = new Vertex3D[sizeVertex];
 			for (int i = 0; i < sizeVertex; i++) { 
 				vertexX = scan.nextDouble();
 				System.out.println(vertexX);
@@ -132,22 +134,30 @@ public class MyCanvas extends Canvas implements MouseListener,  MouseMotionListe
 				vertexZ = scan.nextDouble();
 				System.out.println(vertexZ);
 			    vectorVertex = Matrixs.CreateVertexVector3D(vertexX, vertexY, vertexZ, 1);
-			    vectorVertex = Mathematics.multiplicateMatrix(mMatrix, vectorVertex);
+			    //vectorVertex = Mathematics.multiplicateMatrix(mMatrix, vectorVertex);
+				vectorVertex = Mathematics.multiplicateMatrix(TrM, vectorVertex);
 			    vertexX = vectorVertex[0][0] + 20;
 			    vertexY = vectorVertex[1][0] + 20;
-				vertexs[i] = new Vertex(vertexX,vertexY);
+				vertexs[i] = new Vertex3D(vertexX,vertexY,vertexZ);
 			}
 			int sizeEdge = scan.nextInt();
 			System.out.println(sizeEdge);
-			g.setColor(Color.MAGENTA);
+			g.setColor(Color.BLACK);
 			g.drawRect(20, 20, (int)vw, (int)vh);
+			g.setColor(Color.BLACK);
+			if (debugging){
+				g.drawLine(0+20, (int)(vw/3), (int)(vw)+20, (int)(vw/3));
+				g.drawLine(0+20, (int)(vw/3)*2, (int)(vw)+20, (int)(vw/3)*2);
+				g.drawLine((int)(vw/3),0+20 , (int)(vw/3), (int)(vw)+20);
+				g.drawLine((int)(vw/3)*2, 0+20, (int)(vw/3)*2, (int)(vw)+20);
+			}
 			Polygon p = new Polygon();
-			Edge[] edges = new Edge[sizeEdge];
+			Edge3D[] edges = new Edge3D[sizeEdge];
 			for (int i = 0; i < sizeEdge; i++) {
-				edges[i] = new Edge(vertexs[scan.nextInt()],vertexs[scan.nextInt()]);
+				edges[i] = new Edge3D(vertexs[scan.nextInt()],vertexs[scan.nextInt()]);
 				p.addPoint((int) edges[i].getV1().getX(), (int) edges[i].getV1().getY());
-				p.addPoint((int) edges[i].getV2().getX(), (int) edges[i].getV2().getY());	
-				g.setColor(Color.BLUE);
+				p.addPoint((int) edges[i].getV2().getX(), (int) edges[i].getV2().getY());
+				g.setColor(Color.GREEN);
 				g.drawPolygon(p);
 				p.reset();
 			}
@@ -204,11 +214,8 @@ public class MyCanvas extends Canvas implements MouseListener,  MouseMotionListe
 		 radiusPStart = Mathematics.distance(pStart, centerX, centerY);
 		 radiusPEnd = Mathematics.distance(pEnd, centerX, centerY);
 		 scaleParameter = radiusPEnd / radiusPStart;
-		 CT = Matrixs.CreateScaleMatrix2D(scaleParameter, scaleParameter);
-		 CT = Mathematics.multiplicateMatrix
-				 (Mathematics.multiplicateMatrix
-						 (Matrixs.CreateTranslateMatrix2D(centerX, centerY), CT)
-						 , Matrixs.CreateTranslateMatrix2D(-centerX, -centerY));
+		 CT = Matrixs.CreateScaleMatrix3D(scaleParameter, scaleParameter, scaleParameter);
+		 CT = Mathematics.multiplicateMatrix(Mathematics.multiplicateMatrix(Matrixs.CreateTranslateMatrix3D(centerX, centerY, 1), CT), Matrixs.CreateTranslateMatrix3D(-centerX, -centerY, 1));
 	}
 	public void executeRotate() {
 		//vector start = (x of start point - x of center point,y of start point - y of center point)
@@ -234,8 +241,8 @@ public class MyCanvas extends Canvas implements MouseListener,  MouseMotionListe
 		// SCALE(SL) TRANSLATE(T) SCALE (SR)
 		// ROTATE(RLD) SCALE(SD) ROTATE(RRD)
 		switch(type) {
-		 case "T":  CT = Matrixs.CreateTranslateMatrix2D(pEnd.getX() - pStart.getX(),
-					pEnd.getY() - pStart.getY());
+		 case "T":  CT = Matrixs.CreateTranslateMatrix3D(pEnd.getX() - pStart.getX(),
+					pEnd.getY() - pStart.getY(),0);
          break;
 		 case "SD": executeScale();
 		 break;
@@ -284,7 +291,7 @@ public class MyCanvas extends Canvas implements MouseListener,  MouseMotionListe
 		pEnd = arg0.getPoint();
 		executeAction(locationTranspormation);
 		TT = Mathematics.multiplicateMatrix(CT, TT);
-		CT = Matrixs.CreateMatrix2D();
+		CT = Matrixs.CreateMatrix3D();
 		this.repaint();
 	}
 	@Override
