@@ -100,12 +100,11 @@ public class MyCanvas extends Canvas implements MouseListener,  MouseMotionListe
 
 		coordinateXCenterWindows = (vw / (wr-wl))/2;
 		coordinateYCenterWindows = (vh / (wt-wb))/2;
-		matrixTr1 = Matrixs.CreateTranslateMatrix3D(-coordinateXCenterWindows, -coordinateYCenterWindows, 0);
+		//matrixTr1 = Matrixs.CreateTranslateMatrix3D(-coordinateXCenterWindows, -coordinateYCenterWindows, 0);
 		//matrixRo = Matrixs.CreateRotateMatrix3D(-1 * Math.toRadians(10));
 		matrixSc1 = Matrixs.CreateScaleMatrix3D(vw / (wr-wl), vh / (wt-wb),1);
-		matrixTr2 = Matrixs.CreateTranslateMatrix3D(20, 20, 0);
-	    //matrixSc2 = Matrixs.CreateScaleMatrix3D(1, -1, 1);
-		//matrixTr3 = Matrixs.CreateTranslateMatrix3D(0, vh + 40,0);
+		matrixTr2 = Matrixs.CreateTranslateMatrix3D((vw/2)+20, (vh/2)+20, 0);
+		matrixTr3 = Matrixs.CreateTranslateMatrix3D(wl+(wr-wl)/2, wb+(wt-wb)/2,0);
 		TT = Matrixs.CreateMatrix3D();
 		CT = Matrixs.CreateMatrix3D();
 		vectorVertex = new double [4][1];
@@ -119,11 +118,7 @@ public class MyCanvas extends Canvas implements MouseListener,  MouseMotionListe
 	}
 	public void paint(Graphics g) {
 		viewMatrix = Mathematics.multiplicateMatrix(matrixTr2 ,matrixSc1);
-		//viewMatrix = Mathematics.multiplicateMatrix(matrixTr3, matrixSc2);
-		//viewMatrix = Mathematics.multiplicateMatrix(viewMatrix, matrixTr2);
-		//viewMatrix = Mathematics.multiplicateMatrix(viewMatrix, matrixSc1);
-		//viewMatrix = Mathematics.multiplicateMatrix(viewMatrix, matrixRo);
-		viewMatrix = Mathematics.multiplicateMatrix(viewMatrix, matrixTr1);
+		viewMatrix = Mathematics.multiplicateMatrix(viewMatrix, matrixTr3);
 		TrM = Mathematics.multiplicateMatrix(CT, TT);
 		TrM = Mathematics.multiplicateMatrix(viewMatrix, TrM);
 		TrM = Mathematics.multiplicateMatrix(TrM, mMatrix);
