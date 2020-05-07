@@ -77,7 +77,7 @@ public class MyCanvas extends Canvas implements MouseListener,  MouseMotionListe
 												  Matrixs.CreateVertexVector3D(0,1,0,-pVector[1][0]),
 												  Matrixs.CreateVertexVector3D(0,0,1,-pVector[2][0]),
 												  Matrixs.CreateVertexVector3D(0,0,0,1));
-			mMatrix = Mathematics.multiplicateMatrix(mMatrix,mTag);
+			//mMatrix = Mathematics.multiplicateMatrix(mMatrix,mTag);
 			wl = setScan.nextDouble();
 			//System.out.println(ww);
 			wr = setScan.nextDouble();
