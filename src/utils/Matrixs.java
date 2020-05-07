@@ -8,9 +8,11 @@ public class Matrixs {
 	        scaleMatrix[0][0] = scaleX;
 	        scaleMatrix[0][1] = 0;
 	        scaleMatrix[0][2] = 0;
+
 	        scaleMatrix[1][0] = 0;
 	        scaleMatrix[1][1] = scaleY;
 	        scaleMatrix[1][2] = 0;
+
 	        scaleMatrix[2][0] = 0;
 	        scaleMatrix[2][1] = 0;
 	        scaleMatrix[2][2] = 1;
@@ -47,9 +49,11 @@ public class Matrixs {
 	        rotateMatrix[0][0] = Math.cos(rotateAngle);
 	        rotateMatrix[0][1] = Math.sin(rotateAngle);
 	        rotateMatrix[0][2] = 0;
+
 	        rotateMatrix[1][0] = -1 * Math.sin(rotateAngle);
 	        rotateMatrix[1][1] = Math.cos(rotateAngle);
 	        rotateMatrix[1][2] = 0;
+
 	        rotateMatrix[2][0] = 0;
 	        rotateMatrix[2][1] = 0;
 	        rotateMatrix[2][2] = 1;
@@ -61,14 +65,17 @@ public class Matrixs {
 		rotateMatrix[0][1] = Math.sin(rotateAngle);
 		rotateMatrix[0][2] = 0;
 		rotateMatrix[0][3] = 0;
+
 		rotateMatrix[1][0] = -1 * Math.sin(rotateAngle);
 		rotateMatrix[1][1] = Math.cos(rotateAngle);
 		rotateMatrix[1][2] = 0;
 		rotateMatrix[1][3] = 0;
+
 		rotateMatrix[2][0] = 0;
 		rotateMatrix[2][1] = 0;
 		rotateMatrix[2][2] = 1;
 		rotateMatrix[2][3] = 0;
+
 		rotateMatrix[3][0] = 0;
 		rotateMatrix[3][1] = 0;
 		rotateMatrix[3][2] = 0;
@@ -83,9 +90,11 @@ public class Matrixs {
 		translateMatrix[0][0] = 1;
 		translateMatrix[0][1] = 0;
 		translateMatrix[0][2] = translateX;
+
 		translateMatrix[1][0] = 0;
 		translateMatrix[1][1] = 1;
 		translateMatrix[1][2] = translateY;
+
 		translateMatrix[2][0] = 0;
 		translateMatrix[2][1] = 0;
 		translateMatrix[2][2] = 1;
@@ -122,9 +131,11 @@ public class Matrixs {
 	        initMatrix[0][0] = 1;
 	        initMatrix[0][1] = 0;
 	        initMatrix[0][2] = 0;
+
 	        initMatrix[1][0] = 0;
 	        initMatrix[1][1] = 1;
 	        initMatrix[1][2] = 0;
+
 	        initMatrix[2][0] = 0;
 	        initMatrix[2][1] = 0;
 	        initMatrix[2][2] = 1;
@@ -136,14 +147,17 @@ public class Matrixs {
 		initMatrix[0][1] = 0;
 		initMatrix[0][2] = 0;
 		initMatrix[0][3] = 0;
+
 		initMatrix[1][0] = 0;
 		initMatrix[1][1] = 1;
 		initMatrix[1][2] = 0;
 		initMatrix[1][3] = 0;
+
 		initMatrix[2][0] = 0;
 		initMatrix[2][1] = 0;
 		initMatrix[2][2] = 1;
 		initMatrix[2][3] = 0;
+
 		initMatrix[3][0] = 0;
 		initMatrix[3][1] = 0;
 		initMatrix[3][2] = 0;
