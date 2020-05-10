@@ -1,3 +1,5 @@
+//Franck Schwartz 329863237
+//Raphael Abenmoha 337689103
 package shape;
 
 public class Vertex3D {
@@ -49,6 +51,10 @@ public class Vertex3D {
      */
     public void setZ(double newZ) {
         this.y = newZ;
+    }
+    public void set(double newX, double newY){
+        x = newX;
+        y = newY;
     }
     public double getY() {
         return this.y;

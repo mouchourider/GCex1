@@ -1,3 +1,5 @@
+//Franck Schwartz 329863237
+//Raphael Abenmoha 337689103
 package shape;
 
 public class Edge3D {

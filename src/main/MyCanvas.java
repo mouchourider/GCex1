@@ -1,24 +1,25 @@
-package maindraw;
+//Franck Schwartz 329863237
+//Raphael Abenmoha 337689103
+package main;
 
 import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
-import java.awt.Polygon;
 import java.awt.event.*;
+import java.awt.geom.Line2D;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
 import utils.Matrixs;
 import utils.Mathematics;
-import shape.Vertex;
 import shape.Vertex3D;
-import shape.Edge;
 import shape.Edge3D;
 public class MyCanvas extends Canvas implements MouseListener,  MouseMotionListener, KeyListener {
 
 	private static final long serialVersionUID = 1L;
-	private static boolean debugging = true;
+	private static boolean debugging = true, clipping = true;
+
 	static String dir = System.getProperty("user.dir");
 	public static final String filename = dir+"\\src\\"+"example3d.scn"; //name of file to read data from.
 	public static final String filenameSettings = dir+"\\src\\"+"example3d.viw"; //name of file to read data from.
@@ -29,12 +30,10 @@ public class MyCanvas extends Canvas implements MouseListener,  MouseMotionListe
 	private double vertexX;
 	private double vertexY;
 	private double vertexZ;
-	private double coordinateXCenterWindows, coordinateYCenterWindows;
 	private double coorXCamera, coorYCamera, coorZCamera;
 	private double coorXLookAt, coorYLookAt, coorZLookAt;
 	private double coorXUpCam, coorYUpCam, coorZUpCam;
-	private double direction;
-	private double ww , wh , wl, wr, wb, wt, vw , vh;
+	private double wl, wr, wb, wt, vw , vh;
 	private double sepertation = 83;
 	private double[] vectorStart, vectorEnd;
 	private double[][] TrM, viewMatrix, CT, TT;
@@ -46,23 +45,17 @@ public class MyCanvas extends Canvas implements MouseListener,  MouseMotionListe
 			setScan = new Scanner(settings);
 			setScan.next();
 			coorXCamera = setScan.nextDouble();
-			//System.out.println(coordinateXCenterWindows);
 			coorYCamera = setScan.nextDouble();
-			//System.out.println(coordinateYCenterWindows);
 			coorZCamera = setScan.nextDouble();
 			setScan.next();
 			pVector = Matrixs.CreateVertexVector3D(coorXCamera, coorYCamera, coorZCamera, 1);
 			coorXLookAt = setScan.nextDouble();
-			//System.out.println(coordinateXCenterWindows);
 			coorYLookAt = setScan.nextDouble();
-			//System.out.println(coordinateYCenterWindows);
 			coorZLookAt = setScan.nextDouble();
 			setScan.next();
 			lVector = Matrixs.CreateVertexVector3D(coorXLookAt, coorYLookAt, coorZLookAt, 1);
 			coorXUpCam = setScan.nextDouble();
-			//System.out.println(coordinateXCenterWindows);
 			coorYUpCam = setScan.nextDouble();
-			//System.out.println(coordinateYCenterWindows);
 			coorZUpCam = setScan.nextDouble();
 			setScan.next();
 			upVector = Matrixs.CreateVertexVector3D(coorXUpCam, coorYUpCam, coorZUpCam, 0);
@@ -78,16 +71,11 @@ public class MyCanvas extends Canvas implements MouseListener,  MouseMotionListe
 												  Matrixs.CreateVertexVector3D(0,0,0,1));
 			mMatrix = Mathematics.multiplicateMatrix(mMatrix,mTag);
 			wl = setScan.nextDouble();
-			//System.out.println(ww);
 			wr = setScan.nextDouble();
-			//System.out.println(wh);
 			wb = setScan.nextDouble();
-			//System.out.println(wh);
 			wt = setScan.nextDouble();
-			//System.out.println(wh);
 			setScan.next();
 			vw = setScan.nextDouble();
-			//System.out.println(vw);
 			vh = setScan.nextDouble();
 			sepertation = vh/3;
 			setScan.close();
@@ -96,14 +84,8 @@ public class MyCanvas extends Canvas implements MouseListener,  MouseMotionListe
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		//for viewer matrix
-
-		coordinateXCenterWindows = (vw / (wr-wl))/2;
-		coordinateYCenterWindows = (vh / (wt-wb))/2;
-		//matrixTr1 = Matrixs.CreateTranslateMatrix3D(-coordinateXCenterWindows, -coordinateYCenterWindows, 0);
-		//matrixRo = Matrixs.CreateRotateMatrix3D(-1 * Math.toRadians(10));
 		matrixSc1 = Matrixs.CreateScaleMatrix3D(vw / (wr-wl), vh / (wt-wb),vh / (wt-wb));
-		matrixTr2 = Matrixs.CreateTranslateMatrix3D((vw/2)+20, (vh/2)+20, 0);
+		matrixTr2 = Matrixs.CreateTranslateMatrix3D((vw/2)-220, (vh/2)-220, 0);
 		matrixTr3 = Matrixs.CreateTranslateMatrix3D(wl+(wr-wl)/2, wb+(wt-wb)/2,0);
 		TT = Matrixs.CreateMatrix3D();
 		CT = Matrixs.CreateMatrix3D();
@@ -130,7 +112,7 @@ public class MyCanvas extends Canvas implements MouseListener,  MouseMotionListe
 			int sizeVertex = scan.nextInt();
 			System.out.println(sizeVertex);
 			Vertex3D[] vertexs = new Vertex3D[sizeVertex];
-			for (int i = 0; i < sizeVertex; i++) { 
+			for (int i = 0; i < sizeVertex; i++) {
 				vertexX = scan.nextDouble();
 				System.out.println(vertexX);
 				vertexY = scan.nextDouble();
@@ -148,23 +130,34 @@ public class MyCanvas extends Canvas implements MouseListener,  MouseMotionListe
 			int sizeEdge = scan.nextInt();
 			System.out.println(sizeEdge);
 			g.setColor(Color.BLACK);
-			g.drawRect(20, 20, (int)vw, (int)vh);
+			g.drawRect(20, 20, (int)vw-20, (int)vh-20);
 			g.setColor(Color.BLACK);
 			if (debugging){
-				g.drawLine(0+20, (int)(vw/3), (int)(vw)+20, (int)(vw/3));
-				g.drawLine(0+20, (int)(vw/3)*2, (int)(vw)+20, (int)(vw/3)*2);
-				g.drawLine((int)(vw/3),0+20 , (int)(vw/3), (int)(vw)+20);
-				g.drawLine((int)(vw/3)*2, 0+20, (int)(vw/3)*2, (int)(vw)+20);
+				g.drawLine(20, (int)(vw/3), (int)(vw), (int)(vw/3));
+				g.drawLine(20, (int)(vw/3)*2, (int)(vw), (int)(vw/3)*2);
+				g.drawLine((int)(vw/3),20 , (int)(vw/3), (int)(vw));
+				g.drawLine((int)(vw/3)*2, 20, (int)(vw/3)*2, (int)(vw));
 			}
-			Polygon p = new Polygon();
+			//Polygon p = new Polygon();
 			Edge3D[] edges = new Edge3D[sizeEdge];
 			for (int i = 0; i < sizeEdge; i++) {
 				edges[i] = new Edge3D(vertexs[scan.nextInt()],vertexs[scan.nextInt()]);
-				p.addPoint((int) edges[i].getV1().getX(), (int) edges[i].getV1().getY());
-				p.addPoint((int) edges[i].getV2().getX(), (int) edges[i].getV2().getY());
+
+
 				g.setColor(Color.GREEN);
-				g.drawPolygon(p);
-				p.reset();
+				if(clipping) {
+					if(lineIn(edges[i])) {
+						edges[i] = clipping(edges[i]);
+						g.drawLine((int) edges[i].getV1().getX(), (int) edges[i].getV1().getY(), (int) edges[i].getV2().getX(), (int) edges[i].getV2().getY());
+					}
+				}
+				else {
+					g.drawLine((int) edges[i].getV1().getX(), (int) edges[i].getV1().getY(), (int) edges[i].getV2().getX(), (int) edges[i].getV2().getY());
+				}
+				//p.addPoint((int) edges[i].getV1().getX(), (int) edges[i].getV1().getY());
+				//p.addPoint((int) edges[i].getV2().getX(), (int) edges[i].getV2().getY());
+				//g.drawPolygon(p);
+				//p.reset();
 			}
 			scan.close();
 			
@@ -221,8 +214,8 @@ public class MyCanvas extends Canvas implements MouseListener,  MouseMotionListe
 		 scaleParameter = radiusPEnd / radiusPStart;
 		 CT = Matrixs.CreateScaleMatrix3D(scaleParameter, scaleParameter, scaleParameter);
 		 CT = Mathematics.multiplicateMatrix(Mathematics.multiplicateMatrix
-						 (Matrixs.CreateTranslateMatrix3D(0, 0, zVectorN[2][0]), CT)
-				 , Matrixs.CreateTranslateMatrix3D(0, 0, -zVectorN[2][0]));
+						 (Matrixs.CreateTranslateMatrix3D(centerX, centerY, zVectorN[2][0]), CT)
+				 , Matrixs.CreateTranslateMatrix3D(-centerX, -centerY, -zVectorN[2][0]));
 	}
 	public void executeRotate() {
 		//vector start = (x of start point - x of center point,y of start point - y of center point)
@@ -238,8 +231,8 @@ public class MyCanvas extends Canvas implements MouseListener,  MouseMotionListe
 		 CT = Matrixs.CreateRotateMatrix3D(Math.toRadians(angleFinish), rotAxis);
 		CT = Mathematics.multiplicateMatrix
 				(Mathematics.multiplicateMatrix
-								(Matrixs.CreateTranslateMatrix3D(0, 0, zVectorN[2][0]), CT)
-						, Matrixs.CreateTranslateMatrix3D(0, 0, -zVectorN[2][0]));
+								(Matrixs.CreateTranslateMatrix3D(centerX, centerY, zVectorN[2][0]), CT)
+						, Matrixs.CreateTranslateMatrix3D(-centerX, -centerY, -zVectorN[2][0]));
 	}
 	public void executeAction(String type) {
 		//the matrix separate in this direction:
@@ -269,6 +262,147 @@ public class MyCanvas extends Canvas implements MouseListener,  MouseMotionListe
 		 default: 
          break;
 		}
+	}
+	public Edge3D clipping(Edge3D toClip){
+		Vertex3D v1 = toClip.getV1();
+		Vertex3D v2 = toClip.getV2();
+		Point p1,p2;
+		boolean upInt, leftInt, downInt, rightInt;
+		Line2D.Double l1 = new Line2D.Double( v1.getX(), v1.getY(), v2.getX(), v2.getY());
+		Line2D.Double up = new Line2D.Double( 20, 20, vw-20, 20 );
+		Line2D.Double left = new Line2D.Double( 20, 20, 20, vh-20 );
+		Line2D.Double down = new Line2D.Double( 20, vh-20, vw-20, vh-20 );
+		Line2D.Double right = new Line2D.Double( vw-20, 20, vw-20, vh-20  );
+		upInt = l1.intersectsLine(up);
+		leftInt = l1.intersectsLine(left);
+		downInt = l1.intersectsLine(down);
+		rightInt = l1.intersectsLine(right);
+		if(!(upInt||leftInt||downInt||rightInt)){
+			return toClip;
+		}
+		if(upInt||(upInt && leftInt)||(upInt && rightInt)||(upInt && downInt)){
+			p1 = Mathematics.get_line_intersection(l1,up);
+			if(leftInt){
+				p2 = Mathematics.get_line_intersection(l1,left);
+				if(v1.getY() < 20){
+					v1.set(p1.x,p1.y);
+					v2.set(p2.x,p2.y);
+				}
+				else{
+					v1.set(p2.x,p2.y);
+					v2.set(p1.x,p1.y);
+				}
+			}
+			else if(rightInt){
+				p2 = Mathematics.get_line_intersection(l1,right);
+				if(v1.getY() < 20){
+					v1.set(p1.x,p1.y);
+					v2.set(p2.x,p2.y);
+				}
+				else{
+					v1.set(p2.x,p2.y);
+					v2.set(p1.x,p1.y);
+				}
+			}
+			else if(downInt){
+				p2 = Mathematics.get_line_intersection(l1,down);
+				if(v1.getY() <= 20){
+					v1.set(p1.x,p1.y);
+					v2.set(p2.x,p2.y);
+				}
+				else{
+					v1.set(p2.x,p2.y);
+					v2.set(p1.x,p1.y);
+				}
+			}
+			else{
+				if(v1.getY() < 20){
+					v1.set(p1.x,p1.y);
+				}
+				else{
+					v2.set(p1.x,p1.y);
+				}
+			}
+		}
+		else if(rightInt||(rightInt && downInt)|| (rightInt && leftInt)){
+			p1 = Mathematics.get_line_intersection(l1,right);
+			if(downInt){
+				p2 = Mathematics.get_line_intersection(l1,down);
+				if(v1.getX() >= vw - 20){
+					v1.set(p1.x,p1.y);
+					v2.set(p2.x,p2.y);
+				}
+				else{
+					v1.set(p2.x,p2.y);
+					v2.set(p1.x,p1.y);
+				}
+			}
+			else if(leftInt){
+				p2 = Mathematics.get_line_intersection(l1,left);
+				if(v1.getX() >= vw - 20){
+					v1.set(p1.x,p1.y);
+					v2.set(p2.x,p2.y);
+				}
+				else{
+					v1.set(p2.x,p2.y);
+					v2.set(p1.x,p1.y);
+				}
+			}
+			else{
+				if(v1.getX() >= vw - 20){
+					v1.set(p1.x,p1.y);
+				}
+				else{
+					v2.set(p1.x,p1.y);
+				}
+			}
+		}
+		else if(leftInt || (leftInt && downInt)){
+			p1 = Mathematics.get_line_intersection(l1,left);
+			if(downInt){
+				p2 = Mathematics.get_line_intersection(l1,down);
+				if(v1.getY() <= 20){
+					v1.set(p1.x,p1.y);
+					v2.set(p2.x,p2.y);
+				}
+				else{
+					v2.set(p1.x,p1.y);
+					v1.set(p2.x,p2.y);
+				}
+			}
+			else{
+				if(v1.getX() <= 20){
+					v1.set(p1.x,p1.y);
+				}
+				else{
+					v2.set(p1.x,p1.y);
+				}
+			}
+
+		}
+		else if(downInt){
+			p1 = Mathematics.get_line_intersection(l1,down);
+			if(v1.getY() > vh - 20){
+				v1.set(p1.x,p1.y);
+			}
+			else{
+				v2.set(p1.x,p1.y);
+			}
+
+		}
+
+		toClip.setV1(v1);
+		toClip.setV2(v2);
+		return toClip;
+	}
+	public boolean lineIn(Edge3D edge){
+		Vertex3D v1 = edge.getV1();
+		Vertex3D v2 = edge.getV2();
+		if(!(v1.getX() > 20 && v1.getX() < vw - 20 && v1.getY() > 20 && v1.getY() < vh - 20))
+			if(!(v2.getX() > 20 && v2.getX() < vw - 20 && v2.getY() > 20 && v2.getY() < vh - 20)){
+				return false;
+			}
+		return true;
 	}
 	@Override
 	public void mouseClicked(MouseEvent arg0) {
@@ -319,6 +453,64 @@ public class MyCanvas extends Canvas implements MouseListener,  MouseMotionListe
 	public void keyTyped(KeyEvent keyEvent) {
 
 	}
+	public void reload(){
+		File settings = new File(filenameSettings);
+		Scanner setScan;
+		try {
+			setScan = new Scanner(settings);
+			setScan.next();
+			coorXCamera = setScan.nextDouble();
+			coorYCamera = setScan.nextDouble();
+			coorZCamera = setScan.nextDouble();
+			setScan.next();
+			pVector = Matrixs.CreateVertexVector3D(coorXCamera, coorYCamera, coorZCamera, 1);
+			coorXLookAt = setScan.nextDouble();
+			coorYLookAt = setScan.nextDouble();
+			coorZLookAt = setScan.nextDouble();
+			setScan.next();
+			lVector = Matrixs.CreateVertexVector3D(coorXLookAt, coorYLookAt, coorZLookAt, 1);
+			coorXUpCam = setScan.nextDouble();
+			coorYUpCam = setScan.nextDouble();
+			coorZUpCam = setScan.nextDouble();
+			setScan.next();
+			upVector = Matrixs.CreateVertexVector3D(coorXUpCam, coorYUpCam, coorZUpCam, 0);
+			zVector = Matrixs.SubAndDivVectors3D(pVector,lVector, 0);
+			zVectorN = Matrixs.SubVectors3D(pVector,lVector, 0);
+			xVector = Matrixs.CrossProdAndDivVectors3D(upVector,zVector, 0);
+			yVector = Matrixs.CrossProdVectors3D(zVector,xVector, 0);
+			wVector = Matrixs.CreateVertexVector3D(0,0,0,1);
+			mMatrix = Matrixs.BuildMatrixFromVectors(xVector,yVector,zVector,wVector);
+			mTag = Matrixs.BuildMatrixFromVectors(Matrixs.CreateVertexVector3D(1,0,0,-pVector[0][0]),
+					Matrixs.CreateVertexVector3D(0,1,0,-pVector[1][0]),
+					Matrixs.CreateVertexVector3D(0,0,1,-pVector[2][0]),
+					Matrixs.CreateVertexVector3D(0,0,0,1));
+			mMatrix = Mathematics.multiplicateMatrix(mMatrix,mTag);
+			wl = setScan.nextDouble();
+			wr = setScan.nextDouble();
+			wb = setScan.nextDouble();
+			wt = setScan.nextDouble();
+			setScan.next();
+			vw = setScan.nextDouble();
+			vh = setScan.nextDouble();
+			sepertation = vh/3;
+			setScan.close();
+			rotAxis = 3;
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		matrixSc1 = Matrixs.CreateScaleMatrix3D(vw / (wr-wl), vh / (wt-wb),vh / (wt-wb));
+		matrixTr2 = Matrixs.CreateTranslateMatrix3D((vw/2)-220, (vh/2)-220, 0);
+		matrixTr3 = Matrixs.CreateTranslateMatrix3D(wl+(wr-wl)/2, wb+(wt-wb)/2,0);
+		TT = Matrixs.CreateMatrix3D();
+		CT = Matrixs.CreateMatrix3D();
+		vectorVertex = new double [4][1];
+		setSize((int)vw + 40, (int)vh + 40);
+		centerX = (vw / 2) + 20;
+		centerY = (vh / 2) + 20;
+		vectorStart = new double[2];
+		vectorEnd = new double[2];
+	}
 
 	@Override
 	public void keyPressed(KeyEvent keyEvent) {
@@ -333,13 +525,16 @@ public class MyCanvas extends Canvas implements MouseListener,  MouseMotionListe
 			rotAxis = 3;
 		}
 		else if(entry == 'c'){
-
+			if(clipping)
+				clipping = false;
+			else
+				clipping = true;
 		}
 		else if(entry == 'r'){
-
+			TT = Matrixs.CreateMatrix3D();
 		}
 		else if(entry == 'l'){
-
+			reload();
 		}
 		else if(entry == 'q'){
 			System.exit(0);
