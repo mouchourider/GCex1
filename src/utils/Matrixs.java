@@ -59,27 +59,73 @@ public class Matrixs {
 	        rotateMatrix[2][2] = 1;
 	        return rotateMatrix;
 	 }
-	public static double[][] CreateRotateMatrix3D(double rotateAngle) {
+	public static double[][] CreateRotateMatrix3D(double rotateAngle, int rotAxis) {
 		double[][] rotateMatrix = new double[4][4];
-		rotateMatrix[0][0] = Math.cos(rotateAngle);
-		rotateMatrix[0][1] = Math.sin(rotateAngle);
-		rotateMatrix[0][2] = 0;
-		rotateMatrix[0][3] = 0;
+		switch (rotAxis) {
+			case 1:
+				rotateMatrix[0][0] = 1;
+				rotateMatrix[0][1] = 0;
+				rotateMatrix[0][2] = 0;
+				rotateMatrix[0][3] = 0;
 
-		rotateMatrix[1][0] = -1 * Math.sin(rotateAngle);
-		rotateMatrix[1][1] = Math.cos(rotateAngle);
-		rotateMatrix[1][2] = 0;
-		rotateMatrix[1][3] = 0;
+				rotateMatrix[1][0] = 0;
+				rotateMatrix[1][1] = Math.cos(rotateAngle);
+				rotateMatrix[1][2] = -Math.sin(rotateAngle);
+				rotateMatrix[1][3] = 0;
 
-		rotateMatrix[2][0] = 0;
-		rotateMatrix[2][1] = 0;
-		rotateMatrix[2][2] = 1;
-		rotateMatrix[2][3] = 0;
+				rotateMatrix[2][0] = 0;
+				rotateMatrix[2][1] = Math.sin(rotateAngle);
+				rotateMatrix[2][2] = Math.cos(rotateAngle);
+				rotateMatrix[2][3] = 0;
 
-		rotateMatrix[3][0] = 0;
-		rotateMatrix[3][1] = 0;
-		rotateMatrix[3][2] = 0;
-		rotateMatrix[3][3] = 1;
+				rotateMatrix[3][0] = 0;
+				rotateMatrix[3][1] = 0;
+				rotateMatrix[3][2] = 0;
+				rotateMatrix[3][3] = 1;
+				break;
+			case 2:
+				rotateMatrix[0][0] = Math.cos(rotateAngle);
+				rotateMatrix[0][1] = 0;
+				rotateMatrix[0][2] = -Math.sin(rotateAngle);
+				rotateMatrix[0][3] = 0;
+
+				rotateMatrix[1][0] = 0;
+				rotateMatrix[1][1] = 1;
+				rotateMatrix[1][2] = 0;
+				rotateMatrix[1][3] = 0;
+
+				rotateMatrix[2][0] = -Math.sin(rotateAngle);;
+				rotateMatrix[2][1] = 0;
+				rotateMatrix[2][2] = Math.cos(rotateAngle);
+				rotateMatrix[2][3] = 0;
+
+				rotateMatrix[3][0] = 0;
+				rotateMatrix[3][1] = 0;
+				rotateMatrix[3][2] = 0;
+				rotateMatrix[3][3] = 1;
+				break;
+			case 3:
+				rotateMatrix[0][0] = Math.cos(rotateAngle);
+				rotateMatrix[0][1] = Math.sin(rotateAngle);
+				rotateMatrix[0][2] = 0;
+				rotateMatrix[0][3] = 0;
+
+				rotateMatrix[1][0] = -1 * Math.sin(rotateAngle);
+				rotateMatrix[1][1] = Math.cos(rotateAngle);
+				rotateMatrix[1][2] = 0;
+				rotateMatrix[1][3] = 0;
+
+				rotateMatrix[2][0] = 0;
+				rotateMatrix[2][1] = 0;
+				rotateMatrix[2][2] = 1;
+				rotateMatrix[2][3] = 0;
+
+				rotateMatrix[3][0] = 0;
+				rotateMatrix[3][1] = 0;
+				rotateMatrix[3][2] = 0;
+				rotateMatrix[3][3] = 1;
+				break;
+		}
 		return rotateMatrix;
 	}
 	 public static double[][] CreateRotateBackMatrix2D(double rotateAngle) {

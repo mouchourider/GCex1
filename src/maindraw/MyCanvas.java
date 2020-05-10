@@ -5,9 +5,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Polygon;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
+import java.awt.event.*;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
@@ -17,7 +15,7 @@ import shape.Vertex;
 import shape.Vertex3D;
 import shape.Edge;
 import shape.Edge3D;
-public class MyCanvas extends Canvas implements MouseListener,  MouseMotionListener{
+public class MyCanvas extends Canvas implements MouseListener,  MouseMotionListener, KeyListener {
 
 	private static final long serialVersionUID = 1L;
 	private static boolean debugging = true;
@@ -26,6 +24,7 @@ public class MyCanvas extends Canvas implements MouseListener,  MouseMotionListe
 	public static final String filenameSettings = dir+"\\src\\"+"example3d.viw"; //name of file to read data from.
 	private String locationTranspormation;
 	private Point pStart, pEnd;
+	private int rotAxis;
 	private double centerX , centerY, radiusPStart, radiusPEnd, scaleParameter;
 	private double vertexX;
 	private double vertexY;
@@ -77,7 +76,7 @@ public class MyCanvas extends Canvas implements MouseListener,  MouseMotionListe
 												  Matrixs.CreateVertexVector3D(0,1,0,-pVector[1][0]),
 												  Matrixs.CreateVertexVector3D(0,0,1,-pVector[2][0]),
 												  Matrixs.CreateVertexVector3D(0,0,0,1));
-			//mMatrix = Mathematics.multiplicateMatrix(mMatrix,mTag);
+			mMatrix = Mathematics.multiplicateMatrix(mMatrix,mTag);
 			wl = setScan.nextDouble();
 			//System.out.println(ww);
 			wr = setScan.nextDouble();
@@ -92,6 +91,7 @@ public class MyCanvas extends Canvas implements MouseListener,  MouseMotionListe
 			vh = setScan.nextDouble();
 			sepertation = vh/3;
 			setScan.close();
+			rotAxis = 3;
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -102,7 +102,7 @@ public class MyCanvas extends Canvas implements MouseListener,  MouseMotionListe
 		coordinateYCenterWindows = (vh / (wt-wb))/2;
 		//matrixTr1 = Matrixs.CreateTranslateMatrix3D(-coordinateXCenterWindows, -coordinateYCenterWindows, 0);
 		//matrixRo = Matrixs.CreateRotateMatrix3D(-1 * Math.toRadians(10));
-		matrixSc1 = Matrixs.CreateScaleMatrix3D(vw / (wr-wl), vh / (wt-wb),1);
+		matrixSc1 = Matrixs.CreateScaleMatrix3D(vw / (wr-wl), vh / (wt-wb),vh / (wt-wb));
 		matrixTr2 = Matrixs.CreateTranslateMatrix3D((vw/2)+20, (vh/2)+20, 0);
 		matrixTr3 = Matrixs.CreateTranslateMatrix3D(wl+(wr-wl)/2, wb+(wt-wb)/2,0);
 		TT = Matrixs.CreateMatrix3D();
@@ -115,13 +115,14 @@ public class MyCanvas extends Canvas implements MouseListener,  MouseMotionListe
 		vectorEnd = new double[2];
 		addMouseListener(this);
 		addMouseMotionListener(this);
+		addKeyListener(this);
 	}
 	public void paint(Graphics g) {
 		viewMatrix = Mathematics.multiplicateMatrix(matrixTr2 ,matrixSc1);
 		viewMatrix = Mathematics.multiplicateMatrix(viewMatrix, matrixTr3);
 		TrM = Mathematics.multiplicateMatrix(CT, TT);
-		TrM = Mathematics.multiplicateMatrix(viewMatrix, TrM);
-		TrM = Mathematics.multiplicateMatrix(TrM, mMatrix);
+		TrM = Mathematics.multiplicateMatrix(mMatrix, TrM);
+		TrM = Mathematics.multiplicateMatrix(TrM, viewMatrix);
 		//read from file
 		File fileName1 = new File(filename);
 		try {
@@ -234,12 +235,11 @@ public class MyCanvas extends Canvas implements MouseListener,  MouseMotionListe
 		 double angleStart = getAngleFromVectorToXAxis(vectorStart);
 		 double angleEnd = getAngleFromVectorToXAxis(vectorEnd);
 		 double angleFinish = angleStart - angleEnd;
-		 
-		 CT = Matrixs.CreateRotateMatrix3D(Math.toRadians(angleFinish));
-		 CT = Mathematics.multiplicateMatrix
-				 (Mathematics.multiplicateMatrix
-						 (Matrixs.CreateTranslateMatrix3D(0, 0, zVectorN[2][0]), CT)
-						 , Matrixs.CreateTranslateMatrix3D(0, 0, -zVectorN[2][0]));
+		 CT = Matrixs.CreateRotateMatrix3D(Math.toRadians(angleFinish), rotAxis);
+		CT = Mathematics.multiplicateMatrix
+				(Mathematics.multiplicateMatrix
+								(Matrixs.CreateTranslateMatrix3D(0, 0, zVectorN[2][0]), CT)
+						, Matrixs.CreateTranslateMatrix3D(0, 0, -zVectorN[2][0]));
 	}
 	public void executeAction(String type) {
 		//the matrix separate in this direction:
@@ -313,5 +313,41 @@ public class MyCanvas extends Canvas implements MouseListener,  MouseMotionListe
 	public void mouseMoved(MouseEvent arg0) {
 		// TODO Auto-generated method stub
 		
+	}
+
+	@Override
+	public void keyTyped(KeyEvent keyEvent) {
+
+	}
+
+	@Override
+	public void keyPressed(KeyEvent keyEvent) {
+		char entry = keyEvent.getKeyChar();
+		if(entry == 'x'){
+			rotAxis = 1;
+		}
+		else if(entry == 'y'){
+			rotAxis = 2;
+		}
+		else if(entry == 'z'){
+			rotAxis = 3;
+		}
+		else if(entry == 'c'){
+
+		}
+		else if(entry == 'r'){
+
+		}
+		else if(entry == 'l'){
+
+		}
+		else if(entry == 'q'){
+			System.exit(0);
+		}
+	}
+
+	@Override
+	public void keyReleased(KeyEvent keyEvent) {
+
 	}
 }
